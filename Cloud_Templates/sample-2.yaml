@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template with EC2s, S3 buckets, RDS (MySQL), and Aurora clusters.
+
+Resources:
+
+  # EC2 Instance without block device mapping
+  EC2Instance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0c55b159cbfafe1f0
+      KeyName: your-key-pair
+      Tags:
+        - Key: Name
+          Value: EC2Instance1
+
+  # EC2 Instance with io2 volume in block device mapping
+  EC2Instance2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0c55b159cbfafe1f0
+      KeyName: your-key-pair
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: io2
+            VolumeSize: 100
+            Iops: 1000
+            DeleteOnTermination: true
+      Tags:
+        - Key: Name
+          Value: EC2Instance2
+
+  # Simple S3 Bucket
+  S3Bucket1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-s3-bucket-with-glacier-transition
+      LifecycleConfiguration:
+        Rules:
+          - Id: GlacierTransitionRule
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 45
+                StorageClass: GLACIER
+            Prefix: "" 
+            ExpirationInDays: 3650 
+
+  # S3 Bucket with Intelligent-Tiering
+  S3Bucket2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'my-intelligenttiering-bucket-${AWS::AccountId}-${AWS::Region}'
+      
+
+  # RDS MySQL Instance
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      MasterUsername: adminuser
+      MasterUserPassword: adminpassword123
+      AllocatedStorage: 20
+      DBInstanceIdentifier: my-mysql-db
+      BackupRetentionPeriod: 7
+      PubliclyAccessible: true
+
+  # Aurora DB Subnet Group
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Aurora DB subnet group
+      SubnetIds:
+        - subnet-xxxxxxxx
+        - subnet-yyyyyyyy
+      DBSubnetGroupName: aurora-subnet-group
+
+  # Aurora Cluster (Provisioned)
+  AuroraCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-mysql
+      MasterUsername: auroraadmin
+      MasterUserPassword: aurorapass123
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      BackupRetentionPeriod: 7
+      DBClusterIdentifier: aurora-cluster
+      EngineMode: provisioned
+      PerformanceInsightsEnabled: true
+      PerformanceInsightsRetentionPeriod: 93
+
+  # Aurora Cluster Instance (Provisioned)
+  AuroraInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.r5.large
+      Engine: aurora-mysql
+      DBClusterIdentifier: !Ref AuroraCluster
+
+  # Aurora Serverless v2 Cluster
+  AuroraServerlessV2Cluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-mysql
+      EngineMode: provisioned
+      DBClusterIdentifier: aurora-serverless-v2-cluster
+      MasterUsername: auroraadmin
+      MasterUserPassword: aurorapass123
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      BackupRetentionPeriod: 7
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 3
+        MaxCapacity: 5
+      PerformanceInsightsEnabled: true
+      PerformanceInsightsRetentionPeriod: 93
+
+  # Aurora Serverless v2 Instance
+  AuroraServerlessV2Instance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref AuroraServerlessV2Cluster
+      DBInstanceClass: db.serverless
+      Engine: aurora-mysql
+
+Outputs:
+  EC2Instance1Id:
+    Value: !Ref EC2Instance1
+  EC2Instance2Id:
+    Value: !Ref EC2Instance2
+  S3Bucket1Name:
+    Value: !Ref S3Bucket1
+  S3Bucket2Name:
+    Value: !Ref S3Bucket2
+  RDSInstanceId:
+    Value: !Ref RDSInstance
+  AuroraClusterId:
+    Value: !Ref AuroraCluster
+  AuroraServerlessV2ClusterId:
+    Value: !Ref AuroraServerlessV2Cluster

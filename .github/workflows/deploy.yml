@@ -1,0 +1,30 @@
+name: CloudFormation Cost Analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+    paths:
+      - '**.yml'
+      - '**.yaml'
+      - '**.json'
+
+jobs:
+  analyze-cfn-costs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: CFN Cost Analysis
+        uses: sri-nadh-cloudP/cfn-cost-action@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+          
+
+
+
+

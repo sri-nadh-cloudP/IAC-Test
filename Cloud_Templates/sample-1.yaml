@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "CloudFormation template with two EC2 instances, EBS volumes, and two S3 buckets with lifecycle configuration."
+
+Resources:
+
+  # First EC2 Instance
+  EC2Instance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0c55b159cbfafe1f0  # Change this to a valid AMI ID
+      KeyName: my-key  # Change to your key pair
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 30
+            VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: "EC2-Instance-1"
+
+  # Second EC2 Instance
+  EC2Instance2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.small
+      ImageId: ami-0c55b159cbfafe1f0  # Change this to a valid AMI ID
+      KeyName: my-key  # Change to your key pair
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 40
+            VolumeType: gp3
+      Tags:
+        - Key: Name
+          Value: "EC2-Instance-2"
+
+  # First S3 Bucket
+  S3Bucket1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-first-s3-bucket-12345  # Change to a unique name
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToGlacier
+            Status: Enabled
+            Prefix: ""
+            Transitions:
+              - StorageClass: GLACIER
+                TransitionInDays: 30
+            ExpirationInDays: 365
+
+  # Second S3 Bucket
+  S3Bucket2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-second-s3-bucket-12345  # Change to a unique name
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToGlacier
+            Status: Enabled
+            Prefix: ""
+            Transitions:
+              - StorageClass: GLACIER
+                TransitionInDays: 30
+            ExpirationInDays: 365
+
+Outputs:
+  Instance1Id:
+    Description: "ID of the first EC2 instance"
+    Value: !Ref EC2Instance1
+
+  Instance2Id:
+    Description: "ID of the second EC2 instance"
+    Value: !Ref EC2Instance2
+
+  S3Bucket1Name:
+    Description: "Name of the first S3 bucket"
+    Value: !Ref S3Bucket1
+
+  S3Bucket2Name:
+    Description: "Name of the second S3 bucket"
+    Value: !Ref S3Bucket2
