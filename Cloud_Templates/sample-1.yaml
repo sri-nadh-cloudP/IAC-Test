@@ -59,7 +59,7 @@ Resources:
         - Key: BU
           Value: DataScience
         - Key: owner
-          Value: Jane_Doe
+          Value: Jane_doe
         - Key: application
           Value: analytics-dashboard
 
