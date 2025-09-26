@@ -19,7 +19,7 @@ Resources:
           Value: Engineering
         - Key: bu
           Value: Engineering
-        - Key: owner
+        - Key: Owner
           Value: john_smith
         - Key: application
           Value: web-app

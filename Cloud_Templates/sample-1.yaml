@@ -26,8 +26,6 @@ Resources:
       ImageId: ami-0c55b159cbfafe1f0
       KeyName: your-key-pair
       Tags:
-        - Key: Name
-          Value: EC2Instance1
         - Key: Env
           Value: prod
         - Key: cost-center
@@ -54,8 +52,6 @@ Resources:
             Iops: 1000
             DeleteOnTermination: true
       Tags:
-        - Key: Name
-          Value: EC2Instance2
         - Key: env
           Value: staging
         - Key: cost_center
@@ -82,8 +78,6 @@ Resources:
             Prefix: ""
             ExpirationInDays: 3650
       Tags:
-        - Key: Name
-          Value: S3Bucket1
         - Key: env
           Value: prod
         - Key: cost-center
@@ -101,8 +95,6 @@ Resources:
     Properties:
       BucketName: !Sub 'my-intelligenttiering-bucket-${AWS::AccountId}-${AWS::Region}'
       Tags:
-        - Key: Name
-          Value: S3Bucket2
         - Key: env
           Value: dev
         - Key: cost-center
@@ -127,8 +119,6 @@ Resources:
       BackupRetentionPeriod: 7
       PubliclyAccessible: true
       Tags:
-        - Key: Name
-          Value: RDSInstance
         - Key: env
           Value: prod
         - Key: cost-center
@@ -150,8 +140,6 @@ Resources:
         - subnet-yyyyyyyy
       DBSubnetGroupName: aurora-subnet-group
       Tags:
-        - Key: Name
-          Value: AuroraSubnetGroup
         - Key: env
           Value: prod
         - Key: cost-center
@@ -276,8 +264,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
       Tags:
-        - Key: Name
-          Value: EKSServiceRole
         - Key: env
           Value: prod
         - Key: cost-center
@@ -336,8 +322,6 @@ Resources:
             - Type: api
             - Type: audit
       Tags:
-        - Key: Name
-          Value: EKSCluster
         - Key: env
           Value: production
         - Key: cost-center
