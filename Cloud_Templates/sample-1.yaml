@@ -358,7 +358,7 @@ Resources:
         cost-center: Engineering
         Bu: Engineering
         owner: john_smith
-        application: api_gateway
+        application: api-gateway
 
 
   # DynamoDB Table
