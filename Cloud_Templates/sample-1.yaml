@@ -18,7 +18,7 @@ Parameters:
     AllowedPattern: '[a-zA-Z0-9]*'
     ConstraintDescription: Must contain only alphanumeric characters
 Resources:
-  # EC2 Instance without block device mapping
+
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
@@ -37,7 +37,6 @@ Resources:
         - Key: Application
           Value: web_app
 
-  # EC2 Instance with io2 volume in block device mapping
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
@@ -63,7 +62,6 @@ Resources:
         - Key: application
           Value: analytics-dashboard
 
-  # Simple S3 Bucket
   S3Bucket1:
     Type: AWS::S3::Bucket
     Properties:
@@ -130,7 +128,6 @@ Resources:
         - Key: application
           Value: user-portal
 
-  # Aurora DB Subnet Group
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -151,7 +148,6 @@ Resources:
         - Key: application
           Value: user-portal
 
-  # Aurora Cluster (Provisioned)
   AuroraCluster:
     Type: AWS::RDS::DBCluster
     Properties:
@@ -178,7 +174,6 @@ Resources:
         - Key: application
           Value: user-portal
 
-  # Aurora Cluster Instance (Provisioned)
   AuroraInstance:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -199,7 +194,6 @@ Resources:
         - Key: application
           Value: user_portal
 
-  # Aurora Serverless v2 Cluster
   AuroraServerlessV2Cluster:
     Type: AWS::RDS::DBCluster
     Properties:
@@ -229,7 +223,6 @@ Resources:
         - Key: application
           Value: user_portal
 
-  # Aurora Serverless v2 Instance
   AuroraServerlessV2Instance:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -250,7 +243,6 @@ Resources:
         - Key: Application
           Value: user-portal
 
-  # EKS Service Role
   EKSServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -275,7 +267,6 @@ Resources:
         - Key: application
           Value: api-gateway
 
-  # EKS Node Group Role
   EKSNodeGroupRole:
     Type: AWS::IAM::Role
     Properties:
@@ -304,7 +295,6 @@ Resources:
         - Key: application
           Value: api-gateway
 
-  # EKS Cluster
   EKSCluster:
     Type: AWS::EKS::Cluster
     Properties:
@@ -333,7 +323,6 @@ Resources:
         - Key: Application
           Value: api-gateway
 
-  # EKS Node Group
   EKSNodeGroup:
     Type: AWS::EKS::Nodegroup
     Properties:
@@ -361,7 +350,6 @@ Resources:
         application: api-gateway
 
 
-  # DynamoDB Table
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -400,7 +388,6 @@ Resources:
         - Key: Application
           Value: analytics-dashboard
 
-  # Lambda Execution Role
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -441,7 +428,6 @@ Resources:
         - Key: application
           Value: api_gateway
 
-  # Lambda Function
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:

@@ -3,7 +3,6 @@ Description: CloudFormation template with EC2s, S3 buckets, RDS (MySQL), and Aur
 
 Resources:
 
-  # EC2 Instance without block device mapping
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
@@ -24,7 +23,6 @@ Resources:
         - Key: application
           Value: web-app
 
-  # EC2 Instance with io2 volume in block device mapping
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
@@ -74,7 +72,6 @@ Resources:
         - Key: application
           Value: web-app
 
-  # S3 Bucket with Intelligent-Tiering
   S3Bucket2:
     Type: AWS::S3::Bucket
     Properties:
@@ -91,8 +88,6 @@ Resources:
         - Key: application
           Value: analytics-dashboard
       
-
-  # RDS MySQL Instance
   RDSInstance:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -116,7 +111,6 @@ Resources:
         - Key: application
           Value: user-portal
 
-  # Aurora DB Subnet Group
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -160,7 +154,6 @@ Resources:
         - Key: application
           Value: analytics-dashboard
 
-  # Aurora Cluster Instance (Provisioned)
   AuroraInstance:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -205,7 +198,6 @@ Resources:
         - Key: application
           Value: api-gateway
 
-  # Aurora Serverless v2 Instance
   AuroraServerlessV2Instance:
     Type: AWS::RDS::DBInstance
     Properties:
