@@ -41,10 +41,10 @@ Resources:
           Value: staging
         - Key: cost-center
           Value: R&D
-        - Key: bu
+        - Key: BU
           Value: DataScience
         - Key: owner
-          Value: jane_doe
+          Value: janedoe
         - Key: application
           Value: analytics-dashboard
 
