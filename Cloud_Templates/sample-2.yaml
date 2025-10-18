@@ -13,12 +13,12 @@ Resources:
         - Key: Name
           Value: EC2Instance1
         - Key: env
-          Value: Prod
-        - Key: cost_center
-          Value: Engineering
+          Value: prod
+        - Key: cost-center
+          Value: Operations
         - Key: bu
           Value: Engineering
-        - Key: Owner
+        - Key: owner
           Value: john_smith
         - Key: application
           Value: web-app
@@ -33,7 +33,7 @@ Resources:
         - DeviceName: /dev/xvda
           Ebs:
             VolumeType: io2
-            VolumeSize: 90
+            VolumeSize: 110
             Iops: 1000
             DeleteOnTermination: true
       Tags:
@@ -45,6 +45,8 @@ Resources:
           Value: DataScience
         - Key: owner
           Value: jane_doe
+        - Key: application
+          Value: analytics-dashboard
 
   # Simple S3 Bucket
   S3Bucket1:
@@ -81,7 +83,7 @@ Resources:
           Value: dev
         - Key: cost-center
           Value: Marketing
-        - Key: BU
+        - Key: bu
           Value: DataScience
         - Key: owner
           Value: team_storage
@@ -100,10 +102,10 @@ Resources:
       BackupRetentionPeriod: 7
       PubliclyAccessible: true
       Tags:
-        - Key: Env
+        - Key: env
           Value: prod
         - Key: cost-center
-          Value: Financ
+          Value: Finance
         - Key: bu
           Value: Engineering
         - Key: owner
@@ -116,14 +118,16 @@ Resources:
     Properties:
       DBSubnetGroupDescription: Aurora DB subnet group
       SubnetIds:
-        - subnet-xxxxxxxx
-        - subnet-yyyyyyyy
+        - subnet-12345678
+        - subnet-abcdef12
       DBSubnetGroupName: aurora-subnet-group
       Tags:
         - Key: env
           Value: prod
         - Key: cost-center
           Value: Operations
+        - Key: bu
+          Value: Engineering
         - Key: owner
           Value: admin
         - Key: application
@@ -167,8 +171,8 @@ Resources:
           Value: Finance
         - Key: bu
           Value: DataScience
-        - Key: Owner
-          Value: Admin
+        - Key: owner
+          Value: admin
         - Key: application
           Value: analytics-dashboard
 
@@ -195,6 +199,8 @@ Resources:
           Value: R&D
         - Key: bu
           Value: DataScience
+        - Key: owner
+          Value: jane_doe
         - Key: application
           Value: api-gateway
 
