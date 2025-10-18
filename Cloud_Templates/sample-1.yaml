@@ -48,7 +48,7 @@ Resources:
         - DeviceName: /dev/xvda
           Ebs:
             VolumeType: io2
-            VolumeSize: 110
+            VolumeSize: 125
             Iops: 1000
             DeleteOnTermination: true
       Tags:
