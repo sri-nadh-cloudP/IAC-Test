@@ -1,0 +1,21 @@
+{
+  "name": "javascript-app",
+  "version": "1.0.0",
+  "description": "JavaScript CDK App with EC2, S3, and RDS resources",
+  "main": "bin/javascript-app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cdk",
+    "aws",
+    "infrastructure"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aws-cdk-lib": "^2.100.0",
+    "constructs": "^10.0.0"
+  }
+}
+
