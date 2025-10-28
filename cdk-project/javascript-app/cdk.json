@@ -17,6 +17,7 @@
     ]
   },
   "context": {
+    "availability-zones:account=693014165448:region=us-east-1": ["us-east-1a", "us-east-1b", "us-east-1c"],
     "@aws-cdk/customresources:defaultRuntime": "nodejs20.x",
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,

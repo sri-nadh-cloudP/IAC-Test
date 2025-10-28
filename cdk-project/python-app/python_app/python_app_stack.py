@@ -39,7 +39,7 @@ class PythonAppStack(Stack):
                 ec2.BlockDevice(
                     device_name="/dev/sda1",
                     volume=ec2.BlockDeviceVolume.ebs(
-                        volume_size=70,
+                        volume_size=60,
                         volume_type=ec2.EbsDeviceVolumeType.GP3,
                     )
                 )
@@ -123,7 +123,7 @@ class PythonAppStack(Stack):
         # Create RDS Instance
         rds_instance = rds.DatabaseInstance(self, "RDSInstance",
             engine=rds.DatabaseInstanceEngine.mysql(
-                version=rds.MysqlEngineVersion.VER_8_0_35
+                version=rds.MysqlEngineVersion.VER_8_0_33
             ),
             instance_type=ec2.InstanceType.of(
                 ec2.InstanceClass.BURSTABLE3,
