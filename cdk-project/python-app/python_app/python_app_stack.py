@@ -39,7 +39,7 @@ class PythonAppStack(Stack):
                 ec2.BlockDevice(
                     device_name="/dev/sda1",
                     volume=ec2.BlockDeviceVolume.ebs(
-                        volume_size=50,
+                        volume_size=55,
                         volume_type=ec2.EbsDeviceVolumeType.GP3,
                     )
                 )
