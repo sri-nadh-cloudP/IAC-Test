@@ -48,7 +48,7 @@ class JavascriptAppStack extends Stack {
       blockDevices: [
         {
           deviceName: '/dev/sda1',
-          volume: ec2.BlockDeviceVolume.ebs(50, {
+          volume: ec2.BlockDeviceVolume.ebs(55, {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
           }),
         },
