@@ -3,7 +3,6 @@ Description: CloudFormation template with EC2s, S3 buckets, RDS (MySQL), and Aur
 
 Resources:
 
-  # EC2 Instance without block device mapping
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
@@ -13,8 +12,17 @@ Resources:
       Tags:
         - Key: Name
           Value: EC2Instance1
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Operations
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: john_smith
+        - Key: application
+          Value: web-app
 
-  # EC2 Instance with io2 volume in block device mapping
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
@@ -25,12 +33,20 @@ Resources:
         - DeviceName: /dev/xvda
           Ebs:
             VolumeType: io2
-            VolumeSize: 75
+            VolumeSize: 115
             Iops: 1000
             DeleteOnTermination: true
       Tags:
-        - Key: Name
-          Value: EC2Instance2
+        - Key: env
+          Value: staging
+        - Key: cost-center
+          Value: R&D
+        - Key: BU
+          Value: DataScience
+        - Key: owner
+          Value: janedoe
+        - Key: application
+          Value: analytics-dashboard
 
   # Simple S3 Bucket
   S3Bucket1:
@@ -46,15 +62,34 @@ Resources:
                 StorageClass: GLACIER
             Prefix: "" 
             ExpirationInDays: 3650 
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Operations
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: team_storage
+        - Key: application
+          Value: web-app
 
-  # S3 Bucket with Intelligent-Tiering
   S3Bucket2:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub 'my-intelligenttiering-bucket-${AWS::AccountId}-${AWS::Region}'
+      Tags:
+        - Key: env
+          Value: dev
+        - Key: cost-center
+          Value: Marketing
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: team_storage
+        - Key: application
+          Value: analytics-dashboard
       
-
-  # RDS MySQL Instance
   RDSInstance:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -66,16 +101,37 @@ Resources:
       DBInstanceIdentifier: my-mysql-db
       BackupRetentionPeriod: 7
       PubliclyAccessible: true
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Finance
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: user-portal
 
-  # Aurora DB Subnet Group
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: Aurora DB subnet group
       SubnetIds:
-        - subnet-xxxxxxxx
-        - subnet-yyyyyyyy
+        - subnet-12345678
+        - subnet-abcdef12
       DBSubnetGroupName: aurora-subnet-group
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Operations
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: user-portal
 
   # Aurora Cluster (Provisioned)
   AuroraCluster:
@@ -90,14 +146,35 @@ Resources:
       EngineMode: provisioned
       PerformanceInsightsEnabled: true
       PerformanceInsightsRetentionPeriod: 93
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Finance
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: analytics-dashboard
 
-  # Aurora Cluster Instance (Provisioned)
   AuroraInstance:
     Type: AWS::RDS::DBInstance
     Properties:
       DBInstanceClass: db.r5.large
       Engine: aurora-mysql
       DBClusterIdentifier: !Ref AuroraCluster
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Finance
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: analytics-dashboard
 
   # Aurora Serverless v2 Cluster
   AuroraServerlessV2Cluster:
@@ -115,14 +192,35 @@ Resources:
         MaxCapacity: 5
       PerformanceInsightsEnabled: true
       PerformanceInsightsRetentionPeriod: 93
+      Tags:
+        - Key: env
+          Value: test
+        - Key: cost-center
+          Value: R&D
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: jane_doe
+        - Key: application
+          Value: api-gateway
 
-  # Aurora Serverless v2 Instance
   AuroraServerlessV2Instance:
     Type: AWS::RDS::DBInstance
     Properties:
       DBClusterIdentifier: !Ref AuroraServerlessV2Cluster
       DBInstanceClass: db.serverless
       Engine: aurora-mysql
+      Tags:
+        - Key: env
+          Value: test
+        - Key: cost-center
+          Value: R&D
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: jane_doe
+        - Key: application
+          Value: api-gateway
 
 Outputs:
   EC2Instance1Id:
