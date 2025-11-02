@@ -13,6 +13,16 @@ Resources:
       Tags:
         - Key: Name
           Value: EC2Instance1
+        - Key: env
+          Value: Prod
+        - Key: cost_center
+          Value: Engineering
+        - Key: bu
+          Value: Engineering
+        - Key: Owner
+          Value: john_smith
+        - Key: application
+          Value: web-app
 
   # EC2 Instance with io2 volume in block device mapping
   EC2Instance2:
@@ -25,12 +35,18 @@ Resources:
         - DeviceName: /dev/xvda
           Ebs:
             VolumeType: io2
-            VolumeSize: 75
+            VolumeSize: 90
             Iops: 1000
             DeleteOnTermination: true
       Tags:
-        - Key: Name
-          Value: EC2Instance2
+        - Key: env
+          Value: staging
+        - Key: cost-center
+          Value: R&D
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: jane_doe
 
   # Simple S3 Bucket
   S3Bucket1:
@@ -46,12 +62,34 @@ Resources:
                 StorageClass: GLACIER
             Prefix: "" 
             ExpirationInDays: 3650 
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Operations
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: team_storage
+        - Key: application
+          Value: web-app
 
   # S3 Bucket with Intelligent-Tiering
   S3Bucket2:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub 'my-intelligenttiering-bucket-${AWS::AccountId}-${AWS::Region}'
+      Tags:
+        - Key: env
+          Value: dev
+        - Key: cost-center
+          Value: Marketing
+        - Key: BU
+          Value: DataScience
+        - Key: owner
+          Value: team_storage
+        - Key: application
+          Value: analytics-dashboard
       
 
   # RDS MySQL Instance
@@ -66,6 +104,17 @@ Resources:
       DBInstanceIdentifier: my-mysql-db
       BackupRetentionPeriod: 7
       PubliclyAccessible: true
+      Tags:
+        - Key: Env
+          Value: prod
+        - Key: cost-center
+          Value: Financ
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: user-portal
 
   # Aurora DB Subnet Group
   DBSubnetGroup:
@@ -76,6 +125,15 @@ Resources:
         - subnet-xxxxxxxx
         - subnet-yyyyyyyy
       DBSubnetGroupName: aurora-subnet-group
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Operations
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: user-portal
 
   # Aurora Cluster (Provisioned)
   AuroraCluster:
@@ -90,6 +148,17 @@ Resources:
       EngineMode: provisioned
       PerformanceInsightsEnabled: true
       PerformanceInsightsRetentionPeriod: 93
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Finance
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: analytics-dashboard
 
   # Aurora Cluster Instance (Provisioned)
   AuroraInstance:
@@ -98,6 +167,17 @@ Resources:
       DBInstanceClass: db.r5.large
       Engine: aurora-mysql
       DBClusterIdentifier: !Ref AuroraCluster
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Finance
+        - Key: bu
+          Value: DataScience
+        - Key: Owner
+          Value: Admin
+        - Key: application
+          Value: analytics-dashboard
 
   # Aurora Serverless v2 Cluster
   AuroraServerlessV2Cluster:
@@ -115,6 +195,15 @@ Resources:
         MaxCapacity: 5
       PerformanceInsightsEnabled: true
       PerformanceInsightsRetentionPeriod: 93
+      Tags:
+        - Key: env
+          Value: test
+        - Key: cost-center
+          Value: R&D
+        - Key: bu
+          Value: DataScience
+        - Key: application
+          Value: api-gateway
 
   # Aurora Serverless v2 Instance
   AuroraServerlessV2Instance:
@@ -123,6 +212,17 @@ Resources:
       DBClusterIdentifier: !Ref AuroraServerlessV2Cluster
       DBInstanceClass: db.serverless
       Engine: aurora-mysql
+      Tags:
+        - Key: env
+          Value: test
+        - Key: cost-center
+          Value: R&D
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: jane_doe
+        - Key: application
+          Value: api-gateway
 
 Outputs:
   EC2Instance1Id:

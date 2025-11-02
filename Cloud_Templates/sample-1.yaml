@@ -1,83 +1,526 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: "CloudFormation template with two EC2 instances, EBS volumes, and two S3 buckets with lifecycle configuration."
-
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template with EC2s, S3 buckets, RDS (MySQL), Aurora clusters, EKS, DynamoDB, and Lambda.
+Parameters:
+  RDSMasterPassword:
+    Type: String
+    NoEcho: true
+    Description: Master password for RDS instance
+    MinLength: 8
+    MaxLength: 41
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: Must contain only alphanumeric characters
+  AuroraMasterPassword:
+    Type: String
+    NoEcho: true
+    Description: Master password for Aurora cluster
+    MinLength: 8
+    MaxLength: 41
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: Must contain only alphanumeric characters
 Resources:
-
-  # First EC2 Instance
+  # EC2 Instance without block device mapping
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t3.micro
-      ImageId: ami-0c55b159cbfafe1f0  # Change this to a valid AMI ID
-      KeyName: my-key  # Change to your key pair
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 50
-            VolumeType: gp3
+      ImageId: ami-0c55b159cbfafe1f0
+      KeyName: your-key-pair
       Tags:
-        - Key: Name
-          Value: "EC2-Instance-1"
+        - Key: Env
+          Value: prod
+        - Key: cost-center
+          Value: Engineering
+        - Key: bu
+          Value: Engineering
+        - Key: owner_name
+          Value: john_smith
+        - Key: Application
+          Value: web_app
 
-  # Second EC2 Instance
+  # EC2 Instance with io2 volume in block device mapping
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t3.small
-      ImageId: ami-0c55b159cbfafe1f0  # Change this to a valid AMI ID
-      KeyName: my-key  # Change to your key pair
+      InstanceType: t3.micro
+      ImageId: ami-0c55b159cbfafe1f0
+      KeyName: your-key-pair
       BlockDeviceMappings:
-        - DeviceName: /dev/sda1
+        - DeviceName: /dev/xvda
           Ebs:
-            VolumeSize: 40
-            VolumeType: gp3
+            VolumeType: io2
+            VolumeSize: 100
+            Iops: 1000
+            DeleteOnTermination: true
       Tags:
-        - Key: Name
-          Value: "EC2-Instance-2"
+        - Key: env
+          Value: staging
+        - Key: cost_center
+          Value: R&D
+        - Key: BU
+          Value: DataScience
+        - Key: owner
+          Value: Jane_doe
+        - Key: application
+          Value: analytics-dashboard
 
-  # First S3 Bucket
+  # Simple S3 Bucket
   S3Bucket1:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: my-first-s3-bucket-12345  # Change to a unique name
+      BucketName: my-s3-bucket-with-glacier-transition
       LifecycleConfiguration:
         Rules:
-          - Id: TransitionToGlacier
+          - Id: GlacierTransitionRule
             Status: Enabled
-            Prefix: ""
             Transitions:
-              - StorageClass: GLACIER
-                TransitionInDays: 30
-            ExpirationInDays: 365
+              - TransitionInDays: 45
+                StorageClass: GLACIER
+            Prefix: ""
+            ExpirationInDays: 3650
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Operations
+        - Key: bu
+          Value: Engineering
+        - Key: Owner
+          Value: team-storage
+        - Key: application
+          Value: web_app
 
-  # Second S3 Bucket
+  # S3 Bucket with Intelligent-Tiering
   S3Bucket2:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: my-second-s3-bucket-12345  # Change to a unique name
-      LifecycleConfiguration:
-        Rules:
-          - Id: TransitionToGlacier
-            Status: Enabled
-            Prefix: ""
-            Transitions:
-              - StorageClass: GLACIER
-                TransitionInDays: 30
-            ExpirationInDays: 365
+      BucketName: !Sub 'my-intelligenttiering-bucket-${AWS::AccountId}-${AWS::Region}'
+      Tags:
+        - Key: env
+          Value: dev
+        - Key: cost-center
+          Value: R&D
+        - Key: bu
+          Value: DataScience
+        - Key: owner_name
+          Value: team_storage
+        - Key: application
+          Value: analytics_dashboard
+
+  # RDS MySQL Instance
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.t3.micro
+      Engine: mysql
+      MasterUsername: adminuser
+      MasterUserPassword: !Ref RDSMasterPassword
+      AllocatedStorage: 20
+      DBInstanceIdentifier: my-mysql-db
+      BackupRetentionPeriod: 7
+      PubliclyAccessible: true
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Operations
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: user-portal
+
+  # Aurora DB Subnet Group
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Aurora DB subnet group
+      SubnetIds:
+        - subnet-xxxxxxxx
+        - subnet-yyyyyyyy
+      DBSubnetGroupName: aurora-subnet-group
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Operations
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: user-portal
+
+  # Aurora Cluster (Provisioned)
+  AuroraCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-mysql
+      MasterUsername: auroraadmin
+      MasterUserPassword: !Ref AuroraMasterPassword
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      BackupRetentionPeriod: 7
+      DBClusterIdentifier: aurora-cluster
+      EngineMode: provisioned
+      PerformanceInsightsEnabled: true
+      PerformanceInsightsRetentionPeriod: 93
+      Tags:
+        - Key: Name
+          Value: AuroraCluster
+        - Key: env
+          Value: prod
+        - Key: cost_center
+          Value: Operations
+        - Key: bU
+          Value: Engineering
+        - Key: owner
+          Value: admin
+        - Key: application
+          Value: user-portal
+
+  # Aurora Cluster Instance (Provisioned)
+  AuroraInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.r5.large
+      Engine: aurora-mysql
+      DBClusterIdentifier: !Ref AuroraCluster
+      Tags:
+        - Key: Name
+          Value: AuroraInstance
+        - Key: env
+          Value: prod
+        - Key: costcenter
+          Value: Operations
+        - Key: bU
+          Value: Engineering
+        - Key: Owner
+          Value: admin
+        - Key: application
+          Value: user_portal
+
+  # Aurora Serverless v2 Cluster
+  AuroraServerlessV2Cluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-mysql
+      EngineMode: provisioned
+      DBClusterIdentifier: aurora-serverless-v2-cluster
+      MasterUsername: auroraadmin
+      MasterUserPassword: !Ref AuroraMasterPassword
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      BackupRetentionPeriod: 7
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 3
+        MaxCapacity: 5
+      PerformanceInsightsEnabled: true
+      PerformanceInsightsRetentionPeriod: 93
+      Tags:
+        - Key: Name
+          Value: AuroraServerlessV2Cluster
+        - Key: Env
+          Value: staging
+        - Key: cost-center
+          Value: Operations
+        - Key: Bu
+          Value: Engineering
+        - Key: owner
+          Value: admin_
+        - Key: application
+          Value: user_portal
+
+  # Aurora Serverless v2 Instance
+  AuroraServerlessV2Instance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref AuroraServerlessV2Cluster
+      DBInstanceClass: db.serverless
+      Engine: aurora-mysql
+      Tags:
+        - Key: Name
+          Value: AuroraServerlessV2Instance
+        - Key: env
+          Value: Staging
+        - Key: cost-center
+          Value: Operations
+        - Key: Bu
+          Value: Engineering
+        - Key: owner
+          Value: admin
+        - Key: Application
+          Value: user-portal
+
+  # EKS Service Role
+  EKSServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: eks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+      Tags:
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Engineering
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: john_smith
+        - Key: application
+          Value: api-gateway
+
+  # EKS Node Group Role
+  EKSNodeGroupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      Tags:
+        - Key: Name
+          Value: EKSNodeGroupRole
+        - Key: env
+          Value: prod
+        - Key: cost-center
+          Value: Engineering
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: john_smith
+        - Key: application
+          Value: api-gateway
+
+  # EKS Cluster
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: my-eks-cluster
+      Version: '1.28'
+      RoleArn: !GetAtt EKSServiceRole.Arn
+      ResourcesVpcConfig:
+        SubnetIds:
+          - subnet-xxxxxxxx
+          - subnet-yyyyyyyy
+        SecurityGroupIds: []
+      Logging:
+        ClusterLogging:
+          EnabledTypes:
+            - Type: api
+            - Type: audit
+      Tags:
+        - Key: env
+          Value: production
+        - Key: cost-center
+          Value: Engineering
+        - Key: bu
+          Value: Engineering
+        - Key: Owner
+          Value: John_smith
+        - Key: Application
+          Value: api-gateway
+
+  # EKS Node Group
+  EKSNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      ClusterName: !Ref EKSCluster
+      NodegroupName: my-eks-nodegroup
+      NodeRole: !GetAtt EKSNodeGroupRole.Arn
+      Subnets:
+        - subnet-xxxxxxxx
+        - subnet-yyyyyyyy
+      InstanceTypes:
+        - t3.medium
+      AmiType: AL2_x86_64
+      ScalingConfig:
+        MinSize: 1
+        MaxSize: 3
+        DesiredSize: 2
+      UpdateConfig:
+        MaxUnavailablePercentage: 25
+      Tags:
+        Name: EKSNodeGroup
+        Env: prod
+        cost-center: Engineering
+        Bu: Engineering
+        owner: john_smith
+        application: api_gateway
+
+
+  # DynamoDB Table
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: my-dynamodb-table
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: sort_key
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        - AttributeName: sort_key
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1
+          KeySchema:
+            - AttributeName: sort_key
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      Tags:
+        - Key: Name
+          Value: DynamoDBTable
+        - Key: env
+          Value: dev
+        - Key: cost_center
+          Value: R&D
+        - Key: bu
+          Value: DataScience
+        - Key: owner
+          Value: jane_pro
+        - Key: Application
+          Value: analytics-dashboard
+
+  # Lambda Execution Role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt DynamoDBTable.Arn
+      Tags:
+        - Key: Name
+          Value: LambdaExecutionRole
+        - Key: env
+          Value: test
+        - Key: cost-center
+          Value: Engineering
+        - Key: BU
+          Value: Engineering
+        - Key: Owner
+          Value: lambda_team
+        - Key: application
+          Value: api_gateway
+
+  # Lambda Function
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: my-lambda-function
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 128
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+          
+          def lambda_handler(event, context):
+              dynamodb = boto3.resource('dynamodb')
+              table = dynamodb.Table(os.environ['DYNAMODB_TABLE_NAME'])
+              
+              # Example: Put an item into DynamoDB
+              response = table.put_item(
+                  Item={
+                      'id': 'test-id',
+                      'sort_key': 'test-sort',
+                      'data': 'Hello from Lambda!'
+                  }
+              )
+              
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Hello from Lambda!')
+              }
+      Tags:
+        - Key: Name
+          Value: LambdaFunction
+        - Key: Env
+          Value: test
+        - Key: cost_center
+          Value: Engineering
+        - Key: bu
+          Value: Engineering
+        - Key: owner
+          Value: lambda_team
+        - Key: application
+          Value: api-gateway
 
 Outputs:
-  Instance1Id:
-    Description: "ID of the first EC2 instance"
+  EC2Instance1Id:
     Value: !Ref EC2Instance1
-
-  Instance2Id:
-    Description: "ID of the second EC2 instance"
+  EC2Instance2Id:
     Value: !Ref EC2Instance2
-
   S3Bucket1Name:
-    Description: "Name of the first S3 bucket"
     Value: !Ref S3Bucket1
-
   S3Bucket2Name:
-    Description: "Name of the second S3 bucket"
     Value: !Ref S3Bucket2
+  RDSInstanceId:
+    Value: !Ref RDSInstance
+  AuroraClusterId:
+    Value: !Ref AuroraCluster
+  AuroraServerlessV2ClusterId:
+    Value: !Ref AuroraServerlessV2Cluster
+  EKSClusterName:
+    Value: !Ref EKSCluster
+    Description: EKS Cluster Name
+  EKSClusterArn:
+    Value: !GetAtt EKSCluster.Arn
+    Description: EKS Cluster ARN
+  DynamoDBTableName:
+    Value: !Ref DynamoDBTable
+    Description: DynamoDB Table Name
+  DynamoDBTableArn:
+    Value: !GetAtt DynamoDBTable.Arn
+    Description: DynamoDB Table ARN
+  LambdaFunctionName:
+    Value: !Ref LambdaFunction
+    Description: Lambda Function Name
+  LambdaFunctionArn:
+    Value: !GetAtt LambdaFunction.Arn
+    Description: Lambda Function ARN
