@@ -12,4 +12,3 @@ PythonAppStack(app, "PythonAppStack",
 )
 
 app.synth()
-

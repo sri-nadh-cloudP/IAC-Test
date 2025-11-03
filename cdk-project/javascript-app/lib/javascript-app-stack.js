@@ -31,7 +31,7 @@ class JavascriptAppStack extends Stack {
       blockDevices: [
         {
           deviceName: '/dev/sda1',
-          volume: ec2.BlockDeviceVolume.ebs(50, {
+          volume: ec2.BlockDeviceVolume.ebs(70, {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
           }),
         },
@@ -48,7 +48,7 @@ class JavascriptAppStack extends Stack {
       blockDevices: [
         {
           deviceName: '/dev/sda1',
-          volume: ec2.BlockDeviceVolume.ebs(40, {
+          volume: ec2.BlockDeviceVolume.ebs(60, {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
           }),
         },
@@ -112,7 +112,7 @@ class JavascriptAppStack extends Stack {
     // Create RDS Instance
     const rdsInstance = new rds.DatabaseInstance(this, 'RDSInstance', {
       engine: rds.DatabaseInstanceEngine.mysql({
-        version: rds.MysqlEngineVersion.VER_8_0_35,
+        version: rds.MysqlEngineVersion.VER_8_0_33,
       }),
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.BURSTABLE3,

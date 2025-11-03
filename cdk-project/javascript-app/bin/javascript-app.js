@@ -10,4 +10,3 @@ new JavascriptAppStack(app, 'JavascriptAppStack', {
     region: process.env.CDK_DEFAULT_REGION
   }
 });
-
